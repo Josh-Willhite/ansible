@@ -1,0 +1,36 @@
+server {
+        listen 80;
+        #server_name *.joshwillhite.com;
+
+        # We need this to resolve the host, because it's a wildcard.
+        # This is google's DNS server.
+        resolver 8.8.8.8;
+
+        include /etc/nginx/proxy_params;
+
+        # Don't show s3 errors
+        proxy_intercept_errors on;
+        error_page 403 404 500 502 503 @s3error;
+
+        # Setup basic auth
+        auth_basic "Restricted";
+        auth_basic_user_file /etc/nginx/htpasswd.joshwillhite.com;
+
+        error_page 403 404 500 502 503 @s3error;
+
+        # S3 derps if you send it the basic auth header
+        proxy_set_header Authorization "";
+
+        #location ~ ^/assets/(.*)$ {y
+        #        proxy_pass http://$host.s3.amazonaws.com/assets/$1;
+        #}
+
+        location /notes/ {
+		proxy_set_header Host  joshwillhite.com.s3-website-us-west-2.amazonaws.com;
+                proxy_pass http://joshwillhite.com.s3-website-us-west-2.amazonaws.com/;
+        }
+
+        location @s3error {
+                internal;
+        }
+}
