@@ -2,14 +2,14 @@ from flask import Flask
 
 app = Flask(__name__)
 
-
 @app.route('/')
-def hello_world():
-    return 'Hello World! test!'
+def root():
+    return 'root path'
 
-@app.route('/notes')
-def hello_notes():
-    return 'these are notes'
+@app.route('/notes', defaults={'path': ''})
+@app.route('/<path:path>')
+def catch_all(path):
+    return 'requested path: {}'.format(path)
 
 if __name__ == '__main__':
     app.run()
