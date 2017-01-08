@@ -5,11 +5,12 @@ s3_conn = S3Connection()
 bucket = s3_conn.get_bucket('my-notes')
 app = Flask(__name__)
 
-@app.route('/my-notes', defaults={'path': ''})
+@app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def my_notes(path):
-    key_path = path.split('/')[1:][0]
-    key = bucket.get_key(key_path)
+    if len(path) == 0:
+	path = 'index.html'
+    key = bucket.get_key(path)
     contents = key.get_contents_as_string()
     return contents
 
